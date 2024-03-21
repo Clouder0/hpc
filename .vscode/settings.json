@@ -5,6 +5,8 @@
         "compare": "cpp",
         "cstdint": "cpp",
         "format": "cpp",
-        "benchmark.h": "c"
+        "benchmark.h": "c",
+        "stdint.h": "c",
+        "random": "c"
     }
 }
