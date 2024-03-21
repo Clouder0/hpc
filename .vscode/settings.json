@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.sy": "json",
+        "*.css": "tailwindcss",
+        "compare": "cpp",
+        "cstdint": "cpp",
+        "format": "cpp",
+        "benchmark.h": "c"
+    }
+}
