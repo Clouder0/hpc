@@ -12,7 +12,7 @@ void random_fill(size_t n, size_t m, float arr[n][m]) {
 #define N 512
 #define M 512
 #define K 512
-#define TIMES 100
+#define TIMES 500
 #define SZ 4
 
 
@@ -40,7 +40,7 @@ void test_ijk() {
 
 void handle_block(size_t i, size_t j)
 {
-    float res[4];
+    float res[8];
     for (register size_t ii = i; ii < i + SZ; ++ii)
     {
         // result vector
@@ -50,19 +50,24 @@ void handle_block(size_t i, size_t j)
             for (register size_t k = 0; k < N; k += 32)
             {
                 __m256 a0 = _mm256_loadu_ps(A[ii] + k);
-                __m256 a1 = _mm256_loadu_ps(A[ii] + k + 8);
-                __m256 a2 = _mm256_loadu_ps(A[ii] + k + 16);
-                __m256 a3 = _mm256_loadu_ps(A[ii] + k + 24);
                 __m256 b0 = _mm256_loadu_ps(D[jj] + k);
+                __m256 a1 = _mm256_loadu_ps(A[ii] + k + 8);
                 __m256 b1 = _mm256_loadu_ps(D[jj] + k + 8);
+                __m256 a2 = _mm256_loadu_ps(A[ii] + k + 16);
                 __m256 b2 = _mm256_loadu_ps(D[jj] + k + 16);
+                __m256 a3 = _mm256_loadu_ps(A[ii] + k + 24);
                 __m256 b3 = _mm256_loadu_ps(D[jj] + k + 24);
-                __m256 r0 = _mm256_add_ps(_mm256_mul_ps(a1, b1), _mm256_mul_ps(a0, b0));
-                __m256 r1 = _mm256_add_ps(_mm256_mul_ps(a3, b3), _mm256_mul_ps(a2, b2));
-                r = _mm256_add_ps(r, _mm256_add_ps(r0, r1));
+                __m256 r0 = _mm256_mul_ps(a0,b0);
+                __m256 r1 = _mm256_mul_ps(a1,b1);
+                __m256 r2 = _mm256_mul_ps(a2,b2);
+                __m256 r3 = _mm256_mul_ps(a3,b3);
+                __m256 r01 = _mm256_add_ps(r0,r1);
+                __m256 r23 = _mm256_add_ps(r2,r3);
+                r = _mm256_add_ps(r, _mm256_add_ps(r01, r23));
+
             }
             _mm256_storeu_ps(res, r);
-            C[ii][jj] = res[0] + res[1] + res[2] + res[3];
+            C[ii][jj] = res[0] + res[1] + res[2] + res[3] + res[4] + res[5] + res[6] + res[7];
         }
     }
 }
@@ -88,7 +93,7 @@ int main(void) {
 
     // warming up
     struct timespec start = timer_start();
-    for(int i = 0; i < 10; ++i) {
+    for(int i = 0; i < 50; ++i) {
         test_block();
         test_ijk();
         test_ikj();
